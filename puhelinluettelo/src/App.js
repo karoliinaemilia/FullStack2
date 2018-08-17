@@ -1,5 +1,75 @@
 import React from 'react' 
 
+const AddPerson = (props) => {
+  const state = props.state
+
+  const addPerson = (event) => {
+    event.preventDefault()
+    const personObject = {
+      name: state.newName,
+      number: state.newNumber
+    }
+
+    const names = state.persons.map(person => person.name)
+    if (!names.includes(state.newName)) {
+      const persons = state.persons.concat(personObject)
+
+      props.resetState(persons)
+    } else {
+      alert("nimi on jo luettelossa")
+      props.resetState(state.persons)
+    }
+  }
+
+  return (
+    <div>
+      <h3>Lisää uusi</h3>
+      <form onSubmit={addPerson}> 
+        <div> 
+          nimi: 
+          <input 
+            value={state.newName}
+            onChange={props.handeNameChange} /> 
+        </div> 
+        <div>
+          numero: 
+          <input 
+          value={state.newNumber}
+          onChange={props.handleNumberChange}/>
+        </div>
+        <div> 
+          <button type="submit">lisää</button> 
+        </div> 
+      </form> 
+    </div>
+  )
+}
+
+const ShowPersons = (props) => {
+  const state = props.state
+  
+  const personsToShow = 
+      state.filter === '' ?
+        state.persons :
+          state.persons.filter(person => person.name.toLowerCase().includes(state.filter.toLowerCase()) ||
+          person.number.includes(state.filter))
+
+  return (
+    <div>
+      <h3>Numerot</h3> 
+      <table>
+        <tbody>
+          {personsToShow.map(person => 
+          <tr key={person.name}>
+            <td>{person.name}</td>
+            <td>{person.number}</td>
+          </tr>)}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 class App extends React.Component { 
   constructor(props) { 
     super(props) 
@@ -28,30 +98,12 @@ class App extends React.Component {
     } 
   } 
 
-  addPerson = (event) => {
-    event.preventDefault()
-    const personObject = {
-      name: this.state.newName,
-      number: this.state.newNumber
-    }
-
-    const names = this.state.persons.map(person => person.name)
-    if (!names.includes(this.state.newName)) {
-      const persons = this.state.persons.concat(personObject)
-
-      this.setState({
-        persons: persons,
-        newName: '',
-        newNumber: ''
-      })
-    } else {
-      alert("nimi on jo luettelossa")
-      this.setState({
-        newName: '',
-        newNumber: ''
-      })
-    }
-
+  resetState = (value) => {
+    this.setState({
+      persons: value,
+      newName: '',
+      newNumber: ''
+    })
   }
 
   handeNameChange = (event) => {
@@ -67,12 +119,6 @@ class App extends React.Component {
   }
   
   render() {
-    const personsToShow = 
-      this.state.filter === '' ?
-        this.state.persons :
-          this.state.persons.filter(person => person.name.toLowerCase().includes(this.state.filter.toLowerCase()) ||
-          person.number.includes(this.state.filter))
-
     return ( 
     <div> 
       <h2>Puhelinluettelo</h2> 
@@ -82,34 +128,9 @@ class App extends React.Component {
           value={this.state.filter}
           onChange={this.handleFilterChange}/>
       </div>
-      <h3>Lisää uusi</h3>
-      <form onSubmit={this.addPerson}> 
-        <div> 
-          nimi: 
-          <input 
-            value={this.state.newName}
-            onChange={this.handeNameChange} /> 
-        </div> 
-        <div>
-          numero: 
-          <input 
-          value={this.state.newNumber}
-          onChange={this.handleNumberChange}/>
-        </div>
-        <div> 
-          <button type="submit">lisää</button> 
-        </div> 
-      </form> 
-      <h3>Numerot</h3> 
-      <table>
-        <tbody>
-          {personsToShow.map(person => 
-          <tr key={person.name}>
-            <td>{person.name}</td>
-            <td>{person.number}</td>
-          </tr>)}
-        </tbody>
-      </table>
+      <AddPerson state={this.state} handeNameChange={this.handeNameChange}
+      handleNumberChange={this.handleNumberChange} resetState={this.resetState}/>
+      <ShowPersons state={this.state} />
     </div> 
     ) 
   } 
