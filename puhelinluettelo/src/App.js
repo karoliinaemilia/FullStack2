@@ -68,6 +68,10 @@ const ShowPersons = (props) => {
           <tr key={person.name}>
             <td>{person.name}</td>
             <td>{person.number}</td>
+            <td><button onClick={
+              props.deletePerson(person.id, person.name)}>
+              poista </button>
+            </td>
           </tr>)}
         </tbody>
       </table>
@@ -113,6 +117,18 @@ class App extends React.Component {
   handleFilterChange = (event) => {
     this.setState({ filter: event.target.value })
   }
+
+  deletePerson = (id, name) => {
+    return () => {
+      if (window.confirm(`poistetaanko ${name}`)) {
+        personService.deletePerson(id).then(response => {
+          this.setState({
+            persons: this.state.persons.filter(person => person.id !== id)
+          })
+        })
+      }    
+    }
+  }
   
   render() {
     return ( 
@@ -126,7 +142,7 @@ class App extends React.Component {
       </div>
       <AddPerson state={this.state} handeNameChange={this.handeNameChange}
       handleNumberChange={this.handleNumberChange} resetState={this.resetState}/>
-      <ShowPersons state={this.state} />
+      <ShowPersons state={this.state} deletePerson={this.deletePerson} persons={this.state.persons}/>
     </div> 
     ) 
   } 
