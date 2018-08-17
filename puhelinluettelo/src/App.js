@@ -14,8 +14,12 @@ const AddPerson = (props) => {
     const names = state.persons.map(person => person.name)
     if (!names.includes(state.newName)) {
       const persons = state.persons.concat(personObject)
-
+      
       props.resetState(persons)
+
+      axios
+        .post('http://localhost:3001/persons', personObject)
+
     } else {
       alert("nimi on jo luettelossa")
       props.resetState(state.persons)
