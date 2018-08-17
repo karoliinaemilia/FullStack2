@@ -17,12 +17,20 @@ class App extends React.Component {
       name: this.state.newName
     }
 
-    const persons = this.state.persons.concat(personObject)
+    const names = this.state.persons.map(person => person.name)
+    if (!names.includes(this.state.newName)) {
+      const persons = this.state.persons.concat(personObject)
 
-    this.setState({
-      persons: persons,
-      newName: ''
-    })
+      this.setState({
+        persons: persons,
+        newName: ''
+      })
+    } else {
+      alert("nimi on jo luettelossa")
+      this.setState({
+        newName: ''
+      })
+    }
 
   }
 
