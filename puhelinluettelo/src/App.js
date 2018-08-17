@@ -1,6 +1,17 @@
 import React from 'react' 
 import personService from './services/persons'
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  } 
+  return (
+    <div className="done">
+      {message}
+    </div>
+  )
+}
+
 const AddPerson = (props) => {
   const state = props.state
 
@@ -21,6 +32,7 @@ const AddPerson = (props) => {
         .create(personObject)
         .then(response => {
           props.resetState(state.persons.concat(response.data))
+          props.changeDone(`${personObject.name} lisättiin`)
         })
 
     } else {
@@ -88,7 +100,8 @@ class App extends React.Component {
       persons: [], 
       newName: '',
       newNumber: '',
-      filter: ''
+      filter: '',
+      done: null
     } 
   } 
 
@@ -106,6 +119,15 @@ class App extends React.Component {
       newName: '',
       newNumber: ''
     })
+  }
+
+  changeDone = (message) => {
+    this.setState({
+      done: message
+    })
+    setTimeout(() => {
+      this.setState({ done: null })
+    }, 5000);
   }
 
   handeNameChange = (event) => {
@@ -128,6 +150,7 @@ class App extends React.Component {
             persons: this.state.persons.filter(person => person.id !== id)
           })
         })
+        this.changeDone(`${name} poistettiin`)
       }    
     }
   }
@@ -141,6 +164,7 @@ class App extends React.Component {
       personService.changeNumber(person.id, changedContact).then(
         response => {
           this.resetState(this.state.persons.map(p => p.id !== person.id ? p : changedContact))
+          this.changeDone(`henkilön ${person.name} numero muutettiin`)
         }
       )
     }
@@ -150,6 +174,7 @@ class App extends React.Component {
     return ( 
     <div> 
       <h2>Puhelinluettelo</h2> 
+      <Notification message={this.state.done} />
       <div>
         rajaa näytettäviä
         <input 
@@ -158,7 +183,7 @@ class App extends React.Component {
       </div>
       <AddPerson state={this.state} handeNameChange={this.handeNameChange}
       handleNumberChange={this.handleNumberChange} resetState={this.resetState}
-      updateNumber={this.updateNumber}/>
+      updateNumber={this.updateNumber} changeDone={this.changeDone}/>
       <ShowPersons state={this.state} deletePerson={this.deletePerson} persons={this.state.persons}/>
     </div> 
     ) 
