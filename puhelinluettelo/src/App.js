@@ -12,17 +12,19 @@ const AddPerson = (props) => {
     }
 
     const names = state.persons.map(person => person.name)
+    const persons = state.persons.concat(personObject)
     if (!names.includes(state.newName)) {
-      const persons = state.persons.concat(personObject)
       
       props.resetState(persons)
 
       personService
         .create(personObject)
+        .then(response => {
+          props.resetState(state.persons.concat(response.data))
+        })
 
     } else {
-      alert("nimi on jo luettelossa")
-      props.resetState(state.persons)
+      props.updateNumber(persons.find(p => p.name === personObject.name), personObject.number)
     }
   }
 
@@ -129,6 +131,20 @@ class App extends React.Component {
       }    
     }
   }
+
+  updateNumber = (person, newNumber) => {
+    if (window.confirm(`${person.name} on jo luettelossa, korvataanko vanha numero uudella?`)) {
+      const changedContact = {
+        ...person, number: newNumber
+      }
+
+      personService.changeNumber(person.id, changedContact).then(
+        response => {
+          this.resetState(this.state.persons.map(p => p.id !== person.id ? p : changedContact))
+        }
+      )
+    }
+  }
   
   render() {
     return ( 
@@ -141,7 +157,8 @@ class App extends React.Component {
           onChange={this.handleFilterChange}/>
       </div>
       <AddPerson state={this.state} handeNameChange={this.handeNameChange}
-      handleNumberChange={this.handleNumberChange} resetState={this.resetState}/>
+      handleNumberChange={this.handleNumberChange} resetState={this.resetState}
+      updateNumber={this.updateNumber}/>
       <ShowPersons state={this.state} deletePerson={this.deletePerson} persons={this.state.persons}/>
     </div> 
     ) 
