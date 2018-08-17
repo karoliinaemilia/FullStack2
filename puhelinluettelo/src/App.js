@@ -42,7 +42,7 @@ const AddPerson = (props) => {
 
   return (
     <div>
-      <h3>Lisää uusi</h3>
+      <h3>Lisää uusi / muuta olemassaolevan numeroa</h3>
       <form onSubmit={addPerson}> 
         <div> 
           nimi: 
@@ -165,8 +165,13 @@ class App extends React.Component {
         response => {
           this.resetState(this.state.persons.map(p => p.id !== person.id ? p : changedContact))
           this.changeDone(`henkilön ${person.name} numero muutettiin`)
-        }
-      )
+      }).catch(error => {
+        personService.create(changedContact).then( response => {
+          this.resetState(this.state.persons.filter(p => p.name !== person.name))
+          this.resetState(this.state.persons.concat(response.data))
+          this.changeDone(`henkilön ${person.name} numero muutettiin`)
+        })
+      })
     }
   }
   
