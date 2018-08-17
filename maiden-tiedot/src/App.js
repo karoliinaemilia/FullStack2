@@ -25,21 +25,30 @@ const Country = (props) => {
 const ShowCountries = (props) => {
   const filter = props.filter
 
-  if (filter === '') {
-    return null
+  if (props.clickCountry !== '') {
+    const country = props.clickCountry
+    return <Country country={country} />
   } else {
-    const filtered = props.countries.filter(
-      country => country.name.toLowerCase().includes(filter.toLowerCase())
-    )
-    if (filtered.length > 10) {
-      return <div>too many matches, specify another filter</div>
-    } else if (filtered.length > 1) {
-      return <div>{filtered.map(country => <div key={country.alpha3Code}>{country.name}</div>)}</div>
-    } else if (filtered.length === 1) {
-      const country = filtered[0]
-      return <Country country={country} />
+    if (filter === '') {
+      return null
     } else {
-      return <div>no matches</div>
+      const filtered = props.countries.filter(
+        country => country.name.toLowerCase().includes(filter.toLowerCase())
+      )
+      if (filtered.length > 10) {
+        return <div>too many matches, specify another filter</div>
+      } else if (filtered.length > 1) {
+        return <div>{filtered.map(country => 
+          <div key={country.alpha3Code} onClick={() => {
+            props.setClickCountry(country)
+          }}>{country.name}</div>)}
+          </div>
+      } else if (filtered.length === 1) {
+        const country = filtered[0]
+        return <Country country={country} />
+      } else {
+        return <div>no matches</div>
+      }
     }
   }
 }
@@ -49,7 +58,8 @@ class App extends React.Component {
     super(props)
     this.state = {
       countries: [],
-      filter: ''
+      filter: '',
+      clickCountry: ''
     }
   }
 
@@ -62,7 +72,16 @@ class App extends React.Component {
   }
 
   handleChange = (event) => {
-    this.setState({ filter: event.target.value })
+    this.setState({ 
+      filter: event.target.value,
+      clickCountry: ''
+    })
+  }
+
+  setClickCountry = (value) => {
+    if (this.state.clickCountry === '') {
+      this.setState({ clickCountry: value })
+    } 
   }
 
   render() {
@@ -72,7 +91,8 @@ class App extends React.Component {
         find countries: 
         <input 
         onChange={this.handleChange}/>
-      <ShowCountries countries={this.state.countries} filter={this.state.filter}/>
+      <ShowCountries countries={this.state.countries} filter={this.state.filter}
+      clickCountry={this.state.clickCountry} setClickCountry={this.setClickCountry}/>
       </div>
     )
   }
