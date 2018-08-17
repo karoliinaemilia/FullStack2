@@ -1,5 +1,5 @@
 import React from 'react' 
-import axios from 'axios'
+import personService from './services/persons'
 
 const AddPerson = (props) => {
   const state = props.state
@@ -17,8 +17,8 @@ const AddPerson = (props) => {
       
       props.resetState(persons)
 
-      axios
-        .post('http://localhost:3001/persons', personObject)
+      personService
+        .create(personObject)
 
     } else {
       alert("nimi on jo luettelossa")
@@ -87,8 +87,8 @@ class App extends React.Component {
   } 
 
   componentDidMount() {
-    axios
-      .get('http://localhost:3001/persons')
+    personService
+      .getAll()
       .then(response => {
         this.setState({ persons: response.data })
       })
